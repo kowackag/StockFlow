@@ -7,8 +7,10 @@ Plan i zasady współpracy: [`HARMONOGRAM.md`](HARMONOGRAM.md).
 
 ## ▶ Następnym razem zaczynamy od
 
-**Etap 1 — Szkielet solution (4 projekty)** — w trakcie, robione w VS 2026: pusta solucja, 3× Class Library,
-1× ASP.NET Core MVC w `src/`, referencje, build, uruchomienie strony MVC, odpowiedzi na 3 pytania sprawdzające.
+**Etap 1 — Szkielet solution** — prawie gotowy (commit `4e4e844`, build OK). Po code review zostało:
+1. dodać referencję **Web → Infrastructure** (brakuje — potrzebna w `Program.cs` do rejestracji DI w etapie 2);
+2. decyzja: usunąć folder `Interfaces` z Domain (interfejsy repozytoriów idą do Application), ewentualnie `Model` → `Entities`;
+3. build + commit → odhaczenie etapu 1.
 
 ---
 
@@ -30,6 +32,13 @@ Plan i zasady współpracy: [`HARMONOGRAM.md`](HARMONOGRAM.md).
 - Push nie działał (`Invalid username or token`) — usunięte stare poświadczenia GitHub z Menedżera poświadczeń Windows,
   logowanie przez przeglądarkę (Git Credential Manager). Commit `1970893` jest na `github.com/kowackag/StockFlow`.
 - VS może poprosić o ponowne zalogowanie do GitHuba (jego zapisane poświadczenia też zostały usunięte).
+
+**Etap 1 — w trakcie**
+- Język VS zmieniony na angielski. Nazwa `StockFlow.Web` zostaje (zamiast `.Presentation`) — Web to też composition root.
+- Projekty utworzone w VS w `src/` (struktura na dysku poprawna), `net10.0`, `Class1.cs` usunięte, build 0 błędów.
+- Pytania sprawdzające: 1 — dobry kierunek (Domain = rdzeń, zależności wskazują do środka); 2 i 3 — omówione
+  (composition root w `Program.cs`; `Domain → Infrastructure` = cykl + uzależnienie reguł biznesowych od technologii).
+  Do powtórki przy etapie 2, gdy pojawi się rejestracja DI.
 
 **Ustalenia:**
 - Solution i projekty tworzymy w Visual Studio 2026 (zmiana — początkowo miał być terminal), projekty w folderze `src/`.
