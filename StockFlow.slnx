@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/StockFlow.Application/StockFlow.Application.csproj" Id="00beb971-249b-4fff-8c86-e67509cbd9c4" />
+    <Project Path="src/StockFlow.Domain/StockFlow.Domain.csproj" Id="ccb9970c-f881-44ad-bb6a-d541d60adc42" />
+    <Project Path="src/StockFlow.Infrastructure/StockFlow.Infrastructure.csproj" Id="866e61bd-d275-4bae-9048-157946d60181" />
+    <Project Path="src/StockFlow.Web/StockFlow.Web.csproj" Id="ffdd1e31-3bcd-46b1-9d3a-d8f72f0f67bf" />
+  </Folder>
+</Solution>
