@@ -18,13 +18,14 @@ namespace StockFlow.Infrastructure
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.Description);
                 entity.Property(e => e.Price).HasColumnType("decimal(18,2)");
-                entity.Property(e => e.Status).IsRequired().HasConversion<string>();
+                entity.Property(e => e.Status).IsRequired().HasConversion<string>().HasMaxLength(20);
                 entity.HasData(
-                    new Product { Id = 1, Name = "Product 1", Description = "Description for Product 1", Price = 10.00m, Status = PublicationStatus.Published },
-                    new Product { Id = 2, Name = "Product 2", Description = "Description for Product 2", Price = 20.00m, Status = PublicationStatus.Hidden },
-                    new Product { Id = 3, Name = "Product 3", Description = "Description for Product 3", Price = 30.00m, Status = PublicationStatus.Published },
-                    new Product { Id = 4, Name = "Product 4", Description = "Description for Product 4", Price = 20.00m, Status = PublicationStatus.Hidden },
-                    new Product { Id = 5, Name = "Product 5", Description = "Description for Product 5", Price = 30.00m, Status = PublicationStatus.Published }
+                    new Product { Id = 1, Name = "Nike Air Max", Price = 170.00m, Status = PublicationStatus.Published },
+                    new Product { Id = 2, Name = "Adidas Ultraboost", Description = "Version 3.0", Price = 260.00m, Status = PublicationStatus.Published },
+                    new Product { Id = 3, Name = "Nike Air Super Max", Description = "Model 2025", Price = 303.00m, Status = PublicationStatus.Published },
+                    new Product { Id = 4, Name = "Converse Chuck Taylor All Star", Price = 230.00m, Status = PublicationStatus.Published },
+                    new Product { Id = 5, Name = "Vans Old Skool", Description = "New colors", Price = 303.00m, Status = PublicationStatus.Published },
+                    new Product { Id = 6, Name = "Nike Air Jordan", Description = "Unisex", Price = 340.00m, Status = PublicationStatus.Hidden }
                 );
             });
         }

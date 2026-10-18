@@ -7,7 +7,8 @@ Plan i zasady współpracy: [`HARMONOGRAM.md`](HARMONOGRAM.md).
 
 ## ▶ Następnym razem zaczynamy od
 
-**Etap 2 — w trakcie: krok 2.1 (Domain) ✅ zamknięty (commit `500f1f1`, pytanie decimal/double — OK); teraz krok 2.2 (EF Core: pakiety, `StockFlowDbContext`,
+**Etap 2 — w trakcie: 2.1 ✅ (`500f1f1`), 2.2 ✅ działa (`4f6028a`); teraz mini-ćwiczenie „druga migracja”
+(limit `Status`, realistyczne dane) + pytania 2 i 3; potem krok 2.3. Opis kroku 2.2 dla porządku: (EF Core: pakiety, `StockFlowDbContext`,
 `ProductConfiguration` + `HasData`, connection string, rejestracja w `Program.cs`, migracja `InitialCreate`)** + 3 pytania
 sprawdzające (dlaczego Tools w Web; dlaczego Fluent API w Infrastructure zamiast atrybutów).
 Pamiętać o konfiguracji `Description` (opcjonalne).
@@ -62,6 +63,13 @@ Potem: 2.3 (DTO, `IProductRepository`, `ProductService`, `ProductRepository`) i 
   Otwarte przed migracją: realistyczne dane w `HasData` (6 produktów, PLN; teraz 5× „Product N”), decyzja
   `OnModelCreating` vs osobna `ProductConfiguration`, pusta linia `Property(Description)`, skąd pakiet `System.Security.Cryptography.Pkcs`.
   Kursu Duszyńskiego nie znam w szczegółach — temat rejestracji DbContext szukać pod „DI / AddDbContext” (starsze .NET: `Startup.cs`).
+- Krok 2.2 ✅ działa (commit `4f6028a`): migracja `InitialCreate` (w repo), `Update-Database` OK, tabela `Products`
+  z 5 wierszami, Status jako tekst, Price `decimal(18,2)`, Name `nvarchar(200)`.
+  Uwaga z migracji: `Status` = `nvarchar(max)` (brak limitu długości → problem z indeksem przy filtrowaniu w etapie 4).
+- Zaproponowane mini-ćwiczenie „druga migracja” (przed 2.3): limit długości `Status`, realistyczne dane (6 produktów
+  ze screena, PLN), opcjonalnie przeniesienie konfiguracji do `ProductConfiguration`; obejrzeć `AlterColumn`/`UpdateData`
+  w migracji przed `Update-Database`. Czekają też odpowiedzi na pytania 2 (Tools w Web) i 3 (Fluent API vs atrybuty)
+  oraz info skąd pakiet `System.Security.Cryptography.Pkcs`.
 - Decyzja: pozostałe klasy domeny (warianty, Brand, Supplier, Address) NIE teraz — kodowane w swoich etapach.
   Na start etapu 5 projektujemy razem model domeny w `MODEL-DOMENY.md`. Do harmonogramu dopisane:
   `Brand` (etap 5), `Supplier` opcjonalnie (etap 9), `Address` jako value object (etap 11).

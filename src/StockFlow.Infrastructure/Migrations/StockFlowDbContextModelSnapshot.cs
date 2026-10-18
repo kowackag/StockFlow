@@ -42,7 +42,8 @@ namespace StockFlow.Infrastructure.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
@@ -52,42 +53,48 @@ namespace StockFlow.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            Description = "Description for Product 1",
-                            Name = "Product 1",
-                            Price = 10.00m,
+                            Name = "Nike Air Max",
+                            Price = 170.00m,
                             Status = "Published"
                         },
                         new
                         {
                             Id = 2,
-                            Description = "Description for Product 2",
-                            Name = "Product 2",
-                            Price = 20.00m,
-                            Status = "Hidden"
+                            Description = "Version 3.0",
+                            Name = "Adidas Ultraboost",
+                            Price = 260.00m,
+                            Status = "Published"
                         },
                         new
                         {
                             Id = 3,
-                            Description = "Description for Product 3",
-                            Name = "Product 3",
-                            Price = 30.00m,
+                            Description = "Model 2025",
+                            Name = "Nike Air Super Max",
+                            Price = 303.00m,
                             Status = "Published"
                         },
                         new
                         {
                             Id = 4,
-                            Description = "Description for Product 4",
-                            Name = "Product 4",
-                            Price = 20.00m,
-                            Status = "Hidden"
+                            Name = "Converse Chuck Taylor All Star",
+                            Price = 230.00m,
+                            Status = "Published"
                         },
                         new
                         {
                             Id = 5,
-                            Description = "Description for Product 5",
-                            Name = "Product 5",
-                            Price = 30.00m,
+                            Description = "New colors",
+                            Name = "Vans Old Skool",
+                            Price = 303.00m,
                             Status = "Published"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Description = "Unisex",
+                            Name = "Nike Air Jordan",
+                            Price = 340.00m,
+                            Status = "Hidden"
                         });
                 });
 #pragma warning restore 612, 618
