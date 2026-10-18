@@ -175,10 +175,13 @@ Każdy etap: **czego się uczysz** · **co robisz** · **gotowe, gdy** · **zwi�
 - **Gotowe, gdy:** lista zachowuje się jak na screenie (wyszukiwanie, filtr, sortowanie i strony działają razem).
 - **Kurs:** LINQ, EF Core (zapytania).
 
-### Etap 5 — Kategorie (relacja jeden-do-wielu)
+### Etap 5 — Kategorie i marki (relacja jeden-do-wielu)
+- **Na start etapu:** projektujemy razem cały model domeny w `MODEL-DOMENY.md` (encje, pola, relacje, otwarte decyzje) —
+  klasy kodujesz potem w ich etapach.
 - **Uczysz się:** relacja 1:N w EF Core, klucz obcy, `Include`, listy rozwijane w formularzu.
-- **Robisz:** `Category` (Ubrania, Buty, Dodatki), przypisanie produktu do kategorii, filtr po kategorii.
-- **Gotowe, gdy:** produkt ma kategorię, a migracja poprawnie tworzy relację w bazie.
+- **Robisz:** `Category` (Ubrania, Buty, Dodatki) i `Brand` (Nike, Adidas, Vans…), przypisanie produktu do kategorii i marki,
+  filtr po kategorii i marce.
+- **Gotowe, gdy:** produkt ma kategorię i markę, a migracja poprawnie tworzy relacje w bazie.
 - **Kurs:** Moduł 7 — relacje.
 
 ### Etap 6 — Warianty i atrybuty
@@ -204,6 +207,7 @@ Każdy etap: **czego się uczysz** · **co robisz** · **gotowe, gdy** · **zwi�
 ### Etap 9 — Inventory (stany magazynowe)
 - **Uczysz się:** modelowanie ruchów magazynowych, transakcje, reguły typu „stan nie może spaść poniżej zera”.
 - **Robisz:** stan per wariant, `StockMovement` (przyjęcie, wydanie, korekta), strona Inventory, kolumna „X stock for Y variants”.
+  Opcjonalnie: `Supplier` (dostawca) przypisany do przyjęcia towaru.
 - **Gotowe, gdy:** przyjęcie towaru zwiększa stan, wydanie go zmniejsza, a historia ruchów jest widoczna.
 - **Kurs:** Moduł 7 — transakcje (jeśli są w kursie).
 
@@ -215,7 +219,8 @@ Każdy etap: **czego się uczysz** · **co robisz** · **gotowe, gdy** · **zwi�
 
 ### Etap 11 — Customers
 - **Uczysz się:** utrwalenie CRUD, value objects (np. adres).
-- **Robisz:** lista klientów, dodawanie i edycja, adres dostawy.
+- **Robisz:** lista klientów, dodawanie i edycja, `Address` jako value object (bez własnego Id; w EF Core jako owned type),
+  adres dostawy.
 - **Gotowe, gdy:** klientów można wybrać przy zamówieniu.
 - **Kurs:** —
 
@@ -258,7 +263,7 @@ Każdy etap: **czego się uczysz** · **co robisz** · **gotowe, gdy** · **zwi�
 - [ ] Etap 2 — Pierwszy wycinek: lista produktów z bazy
 - [ ] Etap 3 — CRUD produktu
 - [ ] Etap 4 — Lista jak na screenie
-- [ ] Etap 5 — Kategorie
+- [ ] Etap 5 — Kategorie i marki
 - [ ] Etap 6 — Warianty i atrybuty
 - [ ] Etap 7 — Refaktoryzacja domeny
 - [ ] Etap 8 — Zdjęcia produktów

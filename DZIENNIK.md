@@ -7,9 +7,10 @@ Plan i zasady współpracy: [`HARMONOGRAM.md`](HARMONOGRAM.md).
 
 ## ▶ Następnym razem zaczynamy od
 
-**Etap 2 — w trakcie: krok 2.1 (Domain) gotowy po review — brakuje commitu; dalej krok 2.2 (EF Core: pakiety, `StockFlowDbContext`,
+**Etap 2 — w trakcie: krok 2.1 (Domain) ✅ zamknięty (commit `500f1f1`, pytanie decimal/double — OK); teraz krok 2.2 (EF Core: pakiety, `StockFlowDbContext`,
 `ProductConfiguration` + `HasData`, connection string, rejestracja w `Program.cs`, migracja `InitialCreate`)** + 3 pytania
-sprawdzające (decimal vs double; dlaczego Tools w Web; dlaczego Fluent API w Infrastructure zamiast atrybutów).
+sprawdzające (dlaczego Tools w Web; dlaczego Fluent API w Infrastructure zamiast atrybutów).
+Pamiętać o konfiguracji `Description` (opcjonalne).
 Potem: 2.3 (DTO, `IProductRepository`, `ProductService`, `ProductRepository`) i 2.4 (kontroler + widok listy).
 
 ---
@@ -55,6 +56,15 @@ Potem: 2.3 (DTO, `IProductRepository`, `ProductService`, `ProductRepository`) i 
   dodatek, Price `decimal`, Status) + `PublicationStatus.cs`. Do przemyślenia: `required` zamiast `= ""` (wrócić w etapie 7).
   Brakuje: commitu kroku 2.1 i odpowiedzi na pytanie „decimal vs double”. Następnie krok 2.2.
   Uwaga do 2.2: `Description` też wymaga konfiguracji (opcjonalne, ewentualnie limit długości).
+- Review 2.2 (w trakcie): ✅ Tools przeniesione do Web, `DbContextOptions<StockFlowDbContext>`, connection string
+  `DefaultConnection` (LocalDB) w `appsettings.json`. ❌ `AddDbContext` stoi PO `app.Run()` — do przeniesienia przed
+  `builder.Build()` (omówiona kolejność w Program.cs: rejestracja usług → Build → pipeline → Run).
+  Otwarte przed migracją: realistyczne dane w `HasData` (6 produktów, PLN; teraz 5× „Product N”), decyzja
+  `OnModelCreating` vs osobna `ProductConfiguration`, pusta linia `Property(Description)`, skąd pakiet `System.Security.Cryptography.Pkcs`.
+  Kursu Duszyńskiego nie znam w szczegółach — temat rejestracji DbContext szukać pod „DI / AddDbContext” (starsze .NET: `Startup.cs`).
+- Decyzja: pozostałe klasy domeny (warianty, Brand, Supplier, Address) NIE teraz — kodowane w swoich etapach.
+  Na start etapu 5 projektujemy razem model domeny w `MODEL-DOMENY.md`. Do harmonogramu dopisane:
+  `Brand` (etap 5), `Supplier` opcjonalnie (etap 9), `Address` jako value object (etap 11).
 - Sprostowanie z review etapu 1: referencje projektów SĄ przechodnie (Web widzi Domain przez Application);
   Web → Infrastructure była potrzebna, bo Infrastructure nie leży w łańcuchu Web → Application → Domain.
 
