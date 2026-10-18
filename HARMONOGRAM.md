@@ -117,10 +117,13 @@ Domain nie zależy od niczego.
 
 Nie są jeszcze ustalone — omówimy je, zanim dojdziemy do danego etapu:
 
-- **Cena na produkcie czy na wariancie?** Na screenie jest jedna cena na produkcie. Propozycja: na start cena na `Product`,
-  w etapie 6 decydujemy, czy wariant może mieć własną cenę (np. większy rozmiar droższy).
+- ✅ **Cena — ustalone (2026-10-18): model C.** Cena bazowa na `Product` (od etapu 2), w etapie 6 wariant dostaje
+  opcjonalną `decimal? Price`; jeśli jest `null`, obowiązuje cena produktu. Powód: rozmiary zwykle kosztują tyle samo,
+  ale wyjątki (XXL, edycja limitowana) są możliwe, a akcesoria mogą nie mieć wariantów.
 - **Stan magazynowy per wariant (SKU), nie per produkt.** Kolumna „100 stock for 1 variants” to suma stanów wariantów.
-- **Czy każdy produkt ma co najmniej jeden wariant?** Propozycja: tak (wariant domyślny) — to upraszcza magazyn i zamówienia.
+- **Czy każdy produkt ma co najmniej jeden wariant?** Akcesoria często nie mają rozmiaru ani koloru — ale stan magazynowy
+  i pozycje zamówień są per wariant, więc trzeba zdecydować, gdzie trzymać stan produktu „bez wariantów”.
+  Propozycja: wariant domyślny bez atrybutów, ukryty w interfejsie. Do decyzji przed etapem 6.
 - **Atrybuty ogólne (`Name` / `Value`) czy konkretne pola `Size` / `Color`?** Ogólne są elastyczniejsze
   (buty: rozmiar EU, dodatki: często brak rozmiaru).
 - **Waluta:** PLN czy $ jak na screenie?
@@ -251,7 +254,7 @@ Każdy etap: **czego się uczysz** · **co robisz** · **gotowe, gdy** · **zwi�
 ## 8. Postęp
 
 - [x] Etap 0 — Środowisko i repozytorium *(2026-10-16)*
-- [ ] Etap 1 — Szkielet solution
+- [x] Etap 1 — Szkielet solution *(2026-10-16)*
 - [ ] Etap 2 — Pierwszy wycinek: lista produktów z bazy
 - [ ] Etap 3 — CRUD produktu
 - [ ] Etap 4 — Lista jak na screenie

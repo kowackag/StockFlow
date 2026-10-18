@@ -7,10 +7,10 @@ Plan i zasady współpracy: [`HARMONOGRAM.md`](HARMONOGRAM.md).
 
 ## ▶ Następnym razem zaczynamy od
 
-**Etap 1 — Szkielet solution** — prawie gotowy (commit `4e4e844`, build OK). Po code review zostało:
-1. dodać referencję **Web → Infrastructure** (brakuje — potrzebna w `Program.cs` do rejestracji DI w etapie 2);
-2. decyzja: usunąć folder `Interfaces` z Domain (interfejsy repozytoriów idą do Application), ewentualnie `Model` → `Entities`;
-3. build + commit → odhaczenie etapu 1.
+**Etap 2 — w trakcie: krok 2.1 (Domain) gotowy po review — brakuje commitu; dalej krok 2.2 (EF Core: pakiety, `StockFlowDbContext`,
+`ProductConfiguration` + `HasData`, connection string, rejestracja w `Program.cs`, migracja `InitialCreate`)** + 3 pytania
+sprawdzające (decimal vs double; dlaczego Tools w Web; dlaczego Fluent API w Infrastructure zamiast atrybutów).
+Potem: 2.3 (DTO, `IProductRepository`, `ProductService`, `ProductRepository`) i 2.4 (kontroler + widok listy).
 
 ---
 
@@ -33,12 +33,30 @@ Plan i zasady współpracy: [`HARMONOGRAM.md`](HARMONOGRAM.md).
   logowanie przez przeglądarkę (Git Credential Manager). Commit `1970893` jest na `github.com/kowackag/StockFlow`.
 - VS może poprosić o ponowne zalogowanie do GitHuba (jego zapisane poświadczenia też zostały usunięte).
 
-**Etap 1 — w trakcie**
+**Etap 1 ukończony ✅** (commity `4e4e844`, `8c39839`)
+- Po review: dodana referencja Web → Infrastructure, usunięty folder `Interfaces` z Domain
+  (interfejsy tylko w Application). Folder `Model` w Domain zostaje (decyzja własna).
 - Język VS zmieniony na angielski. Nazwa `StockFlow.Web` zostaje (zamiast `.Presentation`) — Web to też composition root.
 - Projekty utworzone w VS w `src/` (struktura na dysku poprawna), `net10.0`, `Class1.cs` usunięte, build 0 błędów.
 - Pytania sprawdzające: 1 — dobry kierunek (Domain = rdzeń, zależności wskazują do środka); 2 i 3 — omówione
   (composition root w `Program.cs`; `Domain → Infrastructure` = cykl + uzależnienie reguł biznesowych od technologii).
   Do powtórki przy etapie 2, gdy pojawi się rejestracja DI.
+
+**Etap 2 — rozpoczęty**
+- LocalDB dostępne (`MSSQLLocalDB`). Waluta: PLN (tylko wyświetlanie, `decimal` w kodzie).
+- 2026-10-18: decyzja o cenie — model C (cena bazowa na `Product`, opcjonalna na wariancie od etapu 6).
+  Otwarte: gdzie trzymać stan produktu bez wariantów (propozycja: ukryty wariant domyślny) — przed etapem 6.
+- Omówione: enum to osobny rodzaj typu (nie klasa); enum w folderze `Model` w Domain.
+- Review 2.1 (pierwsze podejście): build ❌ CS0101 — folder `Model/Product` (namespace) koliduje z klasą `Product`.
+  Do poprawy: folder w l. mnogiej (`Products`) lub pliki w `Model`; namespace = ścieżka folderów; `internal` → `public`;
+  `Enums.cs` → `PublicationStatus.cs`; dodać 4 właściwości `Product` (+ nullable dla `Name`).
+  Opcjonalnie: usunąć zbędne `using`, file-scoped namespace.
+- Review 2.1 (drugie podejście): ✅ build OK. `Model/Products/Product.cs` (Id, Name = "", Description `string?` — własny
+  dodatek, Price `decimal`, Status) + `PublicationStatus.cs`. Do przemyślenia: `required` zamiast `= ""` (wrócić w etapie 7).
+  Brakuje: commitu kroku 2.1 i odpowiedzi na pytanie „decimal vs double”. Następnie krok 2.2.
+  Uwaga do 2.2: `Description` też wymaga konfiguracji (opcjonalne, ewentualnie limit długości).
+- Sprostowanie z review etapu 1: referencje projektów SĄ przechodnie (Web widzi Domain przez Application);
+  Web → Infrastructure była potrzebna, bo Infrastructure nie leży w łańcuchu Web → Application → Domain.
 
 **Ustalenia:**
 - Solution i projekty tworzymy w Visual Studio 2026 (zmiana — początkowo miał być terminal), projekty w folderze `src/`.
