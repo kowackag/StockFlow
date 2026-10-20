@@ -1,10 +1,16 @@
 using Microsoft.EntityFrameworkCore;
+using StockFlow.Application.Interfaces;
+using StockFlow.Application.Services;
 using StockFlow.Infrastructure;
+using StockFlow.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 builder.Services.AddDbContext<StockFlowDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
