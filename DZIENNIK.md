@@ -7,79 +7,75 @@ Plan i zasady współpracy: [`HARMONOGRAM.md`](HARMONOGRAM.md).
 
 ## ▶ Następnym razem zaczynamy od
 
-**Etap 2, krok 2.3 — w trakcie (zadanie wydane w sesji 3):**
-- Application: `ProductDto` (DTOs; ewentualnie `record`), `IProductRepository` (`GetAllAsync`, encje, `IReadOnlyList`?),
-  `IProductService` + `ProductService` (repozytorium przez konstruktor, mapowanie ręczne przez `Select`);
-- Infrastructure: `ProductRepository` (`StockFlowDbContext` przez konstruktor, `AsNoTracking()` + `ToListAsync()`);
-- `Program.cs`: `AddScoped` dla repozytorium i serwisu;
-- pytania: DTO zamiast encji; interfejs w Application / implementacja w Infrastructure; Scoped vs Singleton.
-- Application bez referencji do EF Core / Infrastructure.
+**Etap 2, krok 2.4 — w trakcie (zadanie wydane 2026-10-20):** lista produktów w przeglądarce.
+- `ProductController` → `ProductsController` (plik + klasa); `IProductService` przez konstruktor (`private readonly`);
+- akcja `Index` asynchroniczna: `await` na serwisie, lista przekazana do widoku jako model;
+- widok `Views/Products/Index.cshtml`: `@model` z listą `ProductDto`, `@using` (lub `_ViewImports.cshtml`),
+  tabela Product / Status / Price (bez Inventory — etap 8), cena w zł, opcjonalnie badge dla Published/Hidden;
+- link „Products” w menu `_Layout.cshtml` (tag helpery `asp-controller` / `asp-action`);
+- pytania: dlaczego kontroler zależy od `IProductService` (a nie od repozytorium/DbContext); gdzie MVC szuka widoku
+  i czemu nazwa folderu ma znaczenie; co daje `async Task<IActionResult>` i co się stanie bez `await`.
 
-Potem krok 2.4: `ProductsController` + widok listy → produkty z bazy widoczne w przeglądarce (koniec etapu 2).
+Po 2.4: odhaczyć etap 2 w HARMONOGRAM, uzupełnić README „Uruchomienie”.
+
+Stan 2.4 (debug „nic nie wyświetla się na /Products”): konstruktor + `async Task<IActionResult> Index` + `View(products)` ✅.
+Przyczyny: (1) klasa nadal `ProductController` → URL `/Product`, a `/Products` = 404; przy `/Product` MVC szuka
+`Views/Product/` (folder jest `Products`) → „view not found”; (2) widok bez `@model` i tabeli — tylko nagłówek;
+(3) dopisana druga trasa `products` w `Program.cs` — zbędna (domyślna `{controller}/{action}/{id?}` obsługuje każdy
+kontroler; pierwsza pasująca trasa wygrywa) → usunąć. Link w `_Layout` jeszcze nie dodany.
+Dalej: rename na `ProductsController` ✅ (Git: D + ??, po `git add` pokaże rename). `@model` najpierw z nieistniejącym
+`ProductViewModel`, potem `IEnumerable<Product>` (encja z Domain) → kompiluje się, ale w runtime
+`InvalidOperationException` (kontroler przekazuje listę `ProductDto`) — wskazane: `ProductDto` + `@using
+StockFlow.Application.DTOs` w `_ViewImports`. Link w `_Layout`: brak `asp-action` → tag helper bierze bieżącą akcję
+(z Privacy → `/products/Privacy` = 404) → dodać `asp-action="Index"`, `Products` wielką literą. Trasa w `Program.cs` wciąż do usunięcia.
+Użytkowniczka zniechęcona („chyba się do tego nie nadaję”) — przypomniane realne postępy; tempo/zakres kroków do
+pilnowania (mniejsze porcje, więcej konkretu przy nowych tematach jak Razor).
+
+---
+
+## Sesja 4 — 2026-10-19 / 2026-10-20
+
+**Etap 2 — krok 2.3 ukończony ✅** (commity `641c525` feat, `d3ea7e3` docs)
+
+Zrobione:
+- `Application/DTOs/ProductDto` — `init`, `required` dla `Name` i `Status`, `Status` jako `string` (DTO nie wystawia enuma z Domain).
+- `Application/Interfaces/IProductRepository` (`Task<IReadOnlyList<Product>> GetAllAsync()`) i `IProductService`
+  (`Task<IReadOnlyList<ProductDto>> GetAllAsync()`).
+- `Application/Services/ProductService` — `IProductRepository` przez konstruktor, `async`/`await`, mapowanie `Select` + `ToList()`.
+- `Infrastructure/Repositories/ProductRepository` — `StockFlowDbContext` przez konstruktor, `AsNoTracking()` + `ToListAsync()`.
+- `Program.cs` — 2× `AddScoped` (interfejs → implementacja) przed `Build()`.
+- Build 0/0; Application bez EF/Infrastructure. Do commita weszła też pusta `ProductController` (zalążek 2.4).
+
+Lekcje z review:
+- Nazewnictwo: plik = nazwa typu; akronimy 3+ litery PascalCase (`ProductDto`); bez powtarzania „Product” w metodach
+  `IProductRepository`; sufiks `Async` przy metodach zwracających `Task`.
+- Ostrzeżenia nullable traktować poważnie (CS8618 przy `Status` → `required`).
+- YAGNI — tylko metody potrzebne w tym kroku (Delete/GetById w etapie 3); bez zakomentowanego kodu w commitach.
+- Dostęp do bazy asynchronicznie; „async all the way”; nigdy `async void` (dla „nic nie zwraca” → `Task`);
+  przyszłe `Delete` → `Task DeleteAsync` z `FindAsync`/`SaveChangesAsync`; `GetById` → `Product?`.
+- `AsNoTracking()` dla odczytu — opcja zapytania, przed jego wykonaniem.
+- **DI** (Dependency Injection): zależności przez konstruktor zamiast `new`; kontener (`builder.Services`) = rejestr
+  „interfejs → klasa”, sam składa łańcuch Controller → Service → Repository → DbContext; kolejność `Add...` dowolna
+  (byle przed `Build()`); czasy życia Transient / Scoped / Singleton.
+- Błąd MSB3027 „plik zablokowany przez StockFlow.Web” = aplikacja uruchomiona → Shift+F5 i build ponownie.
+- Komendy wpisane w czacie się nie wykonują — terminal, Git Changes w VS albo prefiks `!` w tym oknie.
+
+Pytania kontrolne 2.3:
+1. DTO — „nie wszystkie dane potrzebne, bezpieczniej, szybciej” → bezpieczeństwo ✅, „szybciej” ❌ (encja i tak
+   pobierana w całości). Dopowiedziane: oddzielenie widoku od kształtu encji, dane przygotowane pod ekran.
+2. „Nie wiem” → wyjaśnione: Dependency Inversion — Application definiuje kontrakt, Infrastructure go spełnia;
+   odwrotnie = Application zależne od EF + cykl referencji.
+3. Scoped — „inny użytkownik może zmieniać dane” → kierunek nietrafiony. Właściwie: `DbContext` jest Scoped i nie jest
+   bezpieczny wielowątkowo; obiekt nie może żyć dłużej niż jego zależności (captive dependency — Development rzuca
+   wyjątek przy starcie); jeden `DbContext` na żądanie = wspólny zapis (etapy 10–11).
+
+**Do powtórki:** Dependency Inversion, czasy życia DI i captive dependency.
 
 ---
 
 ## Sesja 3 — 2026-10-18 (po przerwie na kurs)
 
-- Start kroku 2.3 — zadanie wydane (szczegóły w sekcji „Następnym razem” powyżej).
-
-## Sesja 4 — 2026-10-19
-
-- Review punktu 1 kroku 2.3 (`Application/DTOs/ProductDTO.cs`):
-  - ✅ osobny folder/namespace `StockFlow.Application.DTOs`, `public`, `required string Name`, `string? Description`, `decimal Price`.
-  - ❌ brak `Status` — widok listy (screen) ma kolumnę Status; DTO = to, czego potrzebuje widok.
-    Zalecenie: `string Status` (mapowane `.ToString()`), żeby DTO nie wystawiał enuma z Domain.
-  - Drobne: nieużywane `using` (w tym `StockFlow.Domain.Model.Products`), nazwa wg konwencji .NET `ProductDto`
-    (akronimy 3+ litery PascalCase), opcjonalnie `record` / `init` (DTO = niezmienna migawka danych).
-- Poprawki punktu 1: plik i klasa → `ProductDto`, `init` zamiast `set`, usunięte `using`-i, dodany `string Status`.
-  Build: 0 błędów, **1 ostrzeżenie CS8618** — `Status` bez `required` (niekonsekwencja względem `Name`).
-  → poprawione (`required string Status`). **Punkt 1 zamknięty ✅**
-- Punkt 2 (w trakcie) — `IProductRepository` miał `GetProductById` + `DeleteProduct` (synchronicznie).
-  Uwagi: brakuje `GetAllAsync` (jedyna metoda potrzebna liście); Delete/GetById to etap 3 (YAGNI);
-  dostęp do bazy → `Task<...>` + sufiks `Async`; `GetById` przy braku produktu → `Product?`;
-  bez powtarzania „Product” w nazwach metod repozytorium produktów. Interfejs w Application + zwraca encje ✅.
-  `ProductService` już `public` i implementuje `IProductService` ✅ (puste — punkt 3).
-- Punkt 2, druga runda (2026-10-20): `Task<IReadOnlyList<Product>> GetAllAsync()` ✅.
-  Pytanie „czy Delete też async?” — tak: zapis do bazy (`SaveChangesAsync`) → `Task DeleteAsync(int id)`;
-  nigdy `async void` (nie da się `await`, wyjątek wywraca proces). Ale Delete i tak usunąć do etapu 3 (YAGNI),
-  zakomentowany kod też usunąć (historia jest w Gicie).
-  `IProductService`: `List<ProductDto> GetAllProducts()` → musi być async („async all the way”):
-  `Task<IReadOnlyList<ProductDto>> GetAllAsync()`; usunąć szablonowe `using`-i.
-- Trzecia runda: `IProductService` ✅ (`Task<IReadOnlyList<ProductDto>> GetAllAsync()`, czyste `using`-i).
-  `IProductRepository` na dysku bez zmian (Delete + komentarz) — prawdopodobnie niezapisany plik.
-  Build teraz nie przejdzie (CS0535 — `ProductService` nie implementuje `GetAllAsync`) — oczekiwane, to punkt 3.
-- Przegląd całości: build 0/0. `ProductRepository` (punkt 4) już jest: konstruktor + `private readonly` ✅,
-  `GetAllAsync` z `ToListAsync` ✅, ale **brak `AsNoTracking()`**; `Delete` synchroniczny (`Find`/`SaveChanges`)
-  i nadal w interfejsie → usunąć do etapu 3 (albo `DeleteAsync` z `FindAsync`/`SaveChangesAsync`).
-  `ProductService` = szkielet z `NotImplementedException` (brak konstruktora z repozytorium i mapowania).
-  `Program.cs` — brak rejestracji `AddScoped` (punkt 5). Z csproj zniknęły puste `<Folder Include>` — OK, VS
-  sam je usuwa, gdy folder ma pliki. Pytania kontrolne (DTO / interfejs w Application / Scoped) — jeszcze bez odpowiedzi.
-- Kolejny przegląd: `ProductService` ma konstruktor z `IProductRepository` + `private readonly` ✅.
-  `Delete` zakomentowany w interfejsie i repozytorium (zamiast usunięty) — prośba o usunięcie przed commitem.
-  Zostało: `AsNoTracking()`, ciało `ProductService.GetAllAsync` (async/await, Select, ToString statusu, ToList),
-  `AddScoped` ×2 w `Program.cs` (+ `using` do namespace'ów), build 0/0, odpowiedzi na 3 pytania, commit.
-- Wyjaśnione: **DI (Dependency Injection)** — klasa dostaje zależności przez konstruktor zamiast robić `new`;
-  kontener DI (`builder.Services`) = „rejestr przepisów” interfejs → klasa, sam składa łańcuch
-  Controller → Service → Repository → DbContext; czasy życia Transient / Scoped / Singleton (ogólnie).
-- Review kroków A–C: `AsNoTracking()` przed `ToListAsync()` ✅; `ProductService.GetAllAsync` — `async`/`await`,
-  `Select` → `ProductDto`, `Status.ToString()`, `ToList()` ✅; `Program.cs` — 2× `AddScoped` przed `Build()` + `using`-i ✅
-  (kolejność względem `AddDbContext` nie ma znaczenia — kontener składa obiekty dopiero przy żądaniu).
-  Build (do osobnego folderu, bo uruchomiona aplikacja blokowała DLL-e — MSB3027): 0 błędów, 0 ostrzeżeń.
-  Application bez EF/Infrastructure ✅. Do zamknięcia 2.3: usunąć zakomentowany kod, formatowanie (Ctrl+K, Ctrl+D),
-  odpowiedzi na 3 pytania, commit.
-- Odpowiedzi na pytania 2.3:
-  1. DTO — „nie wszystkie dane potrzebne, bezpieczniej, szybciej” → bezpieczeństwo ✅, „szybciej” ❌ (u nas encja i tak
-     pobierana w całości, mapowanie w pamięci). Dopowiedziane: oddzielenie widoku od kształtu encji (etap 7, nawigacje,
-     API w etapie 13), dane przygotowane pod ekran (`Status` jako tekst).
-  2. „Nie wiem” → wyjaśnione: Dependency Inversion — Application definiuje kontrakt, Infrastructure go spełnia;
-     odwrotnie = Application zależne od EF + cykl referencji (Infrastructure → Application już istnieje).
-  3. Scoped — „inny użytkownik może zmieniać dane” → kierunek nietrafiony (zapytanie i tak idzie do bazy).
-     Właściwy powód: `DbContext` jest Scoped i **nie jest bezpieczny wielowątkowo**; serwis nie może żyć dłużej niż
-     jego zależności (captive dependency — w Development kontener rzuci wyjątek przy starcie); jeden `DbContext`
-     na żądanie = wspólna transakcja (etap 10/11).
-  **Do powtórki:** Dependency Inversion, czasy życia DI i captive dependency.
-- Zauważone przy okazji (jeszcze nie review): `Services/ProductService.cs` jest `internal` i pusty — musi być `public`;
-  `Web/Controllers/ProductController.cs` to już krok 2.4 — konwencja nazwy `ProductsController`.
+- Start kroku 2.3 — zadanie wydane.
 
 ---
 
