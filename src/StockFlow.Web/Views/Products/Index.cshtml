@@ -1,15 +1,17 @@
-﻿@using StockFlow.Application.DTOs
-
-@{
+﻿@{
     ViewData["Title"] = "Products";
 }
 @model IEnumerable<ProductDto>
 
-<div class="text-center">
+<div>
     <h1 class="display-4">Products</h1>
+    <table class="table">
+        <thead><tr><th>Name</th><th>Status</th><th>Price</th></tr></thead>
+        <tbody>
    @foreach (var product in Model)
     {
-        <p>@product.Name - @product.Price</p>
+        <tr><td>@product.Name</td><td>@product.Status</td><td>@product.Price</td></tr>
     }
+    </tbody></table>
 
 </div>
